@@ -1,39 +1,41 @@
 name: Build Kivy Calculator APK
 
-on: push: branches: [ main ] pull_request: branches: [ main ]
+on:  # Trigger workflows on push or pull request to main push: branches: - main pull_request: branches: - main
 
-jobs: build: runs-on: ubuntu-latest
+jobs: build: runs-on: ubuntu-latest strategy: matrix: python-version: [3.8, 3.10]
 
 steps:
-- name: Checkout repository
-  uses: actions/checkout@v3
+  - name: Checkout repository
+    uses: actions/checkout@v3
 
-- name: Set up Python
-  uses: actions/setup-python@v4
-  with:
-    python-version: '3.10'
+  - name: Set up Python
+    uses: actions/setup-python@v4
+    with:
+      python-version: ${{ matrix.python-version }}
 
-- name: Install dependencies
-  run: |
-    sudo apt-get update
-    sudo apt-get install -y python3-pip build-essential git python3-dev
-    python -m pip install --upgrade pip
-    pip install buildozer kivy
+  - name: Install system dependencies
+    run: |
+      sudo apt-get update || true
+      sudo apt-get install -y python3-dev git build-essential libssl-dev libffi-dev
 
-- name: Initialize Buildozer
-  run: |
-    buildozer init
-    # Copy your pre-configured buildozer.spec if included in the repo
-    if [ -f ./buildozer.spec ]; then mv buildozer.spec buildozer.spec.bak; fi
-    cp .github/buildozer.spec ./buildozer.spec
+  - name: Install Python dependencies
+    run: |
+      python -m pip install --upgrade pip
+      pip install buildozer kivy
 
-- name: Build APK
-  run: |
-    buildozer android debug
+  - name: Initialize Buildozer spec
+    run: |
+      if [ ! -f buildozer.spec ]; then buildozer init; fi
+      # If you maintain a custom spec in the repo, override
+      if [ -f .github/buildozer.spec ]; then cp .github/buildozer.spec buildozer.spec; fi
 
-- name: Upload APK artifact
-  uses: actions/upload-artifact@v3
-  with:
-    name: calculator-apk
-    path: bin/*.apk
+  - name: Build Android APK
+    run: |
+      buildozer android debug
+
+  - name: Upload APK artifact
+    uses: actions/upload-artifact@v3
+    with:
+      name: calculator-apk
+      path: bin/*.apk
 
