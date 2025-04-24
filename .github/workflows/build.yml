@@ -1,42 +1,57 @@
-name: CI
+name: CI Pipeline
+
 on:
   push:
-    branches: [main]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-      
-#used to to
-      - name: Get Date
-        id: get-date
-        run: I
-         echo "::set-ouput name=date::$(/bin/date -u "+%Y%m%d")"
-        shell: bash
+      # 1. Get the code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Cache Buildozer global directory
-        uses: actions/cache@v3
-        with:
-          path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
+      # 2. Run your build
+      - name: Build project
+        run: |
+          # ← Replace this with your real build command.
+          #     Examples:
+          #       • For Android/Gradle: ./gradlew assembleDebug
+          #       • For Node.js: npm install && npm run build
+          echo "Building…" 
 
-      - uses: actions/cache@v3
-        with:
-          path: .buildozer
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
-
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer android debug
-          buildozer_version: master
-
-      - name: Upload artifacts
+      # 3. Upload the result as an artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: package
-          path: ${{ steps.buildozer.outputs.filename }}
+          name: build-output           # ← Logical name for the artifact
+          path: path/to/output.file    # ← Replace with your actual build file or directory
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # 4a. Get the code again (needed for this job)
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 4b. Download the artifact from the build job
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-output          # ← Must exactly match the upload’s name
+          path: downloaded-artifact   # ← Folder where it will be saved
+
+      # 4c. Verify it’s there
+      - name: List downloaded files
+        run: ls -R downloaded-artifact
+
+      # 4d. (Optional) Use it
+      - name: Use the artifact
+        run: |
+          echo "The artifact is in downloaded-artifact/"
+          # e.g.:
+          # adb install downloaded-artifact/app-debug.apk
