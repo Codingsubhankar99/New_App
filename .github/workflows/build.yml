@@ -1,42 +1,39 @@
-name: CI
-on:
-  push:
-    branches: [ main ]
+name: Build Kivy Calculator APK
 
-jobs:
-  build:
-    runs-on: ubuntu-20.04
+on: push: branches: [ main ] pull_request: branches: [ main ]
 
-    steps:
-uses: actions/checkout@v2
+jobs: build: runs-on: ubuntu-latest
 
-      #used to cache dependencies with a timeou
-      name: Get Date
-        id: get-date
-        run: |
-        echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
-        shell: bash
+steps:
+- name: Checkout repository
+  uses: actions/checkout@v3
 
-name: Cache Buildozer global directory
-        uses: actions/cache@v2
-        with:
-          path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }} # Replace with your path
+- name: Set up Python
+  uses: actions/setup-python@v4
+  with:
+    python-version: '3.10'
 
-uses: actions/cache@v2
-        with:
-          path: .buildozer
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
+- name: Install dependencies
+  run: |
+    sudo apt-get update
+    sudo apt-get install -y python3-pip build-essential git python3-dev
+    python -m pip install --upgrade pip
+    pip install buildozer kivy
 
-name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer android debug
-          buildozer_version: stable
+- name: Initialize Buildozer
+  run: |
+    buildozer init
+    # Copy your pre-configured buildozer.spec if included in the repo
+    if [ -f ./buildozer.spec ]; then mv buildozer.spec buildozer.spec.bak; fi
+    cp .github/buildozer.spec ./buildozer.spec
 
-name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: package
-          path: ${{ steps.buildozer.outputs.filename }}
+- name: Build APK
+  run: |
+    buildozer android debug
+
+- name: Upload APK artifact
+  uses: actions/upload-artifact@v3
+  with:
+    name: calculator-apk
+    path: bin/*.apk
+
