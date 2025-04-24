@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output           # ← Logical name for the artifact
-          path: path/to/output.file    # ← Replace with your actual build file or directory
+          path: First_App/bin/*.apk    # ← Replace with your actual build file or directory
 
   test:
     needs: build
