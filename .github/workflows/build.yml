@@ -1,57 +1,47 @@
-name: CI Pipeline
+name: Build Android APK
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # 1. Get the code
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      # 2. Run your build
-      - name: Build project
-        run: |
-          # ← Replace this with your real build command.
-          #     Examples:
-          #       • For Android/Gradle: ./gradlew assembleDebug
-          #       • For Node.js: npm install && npm run build
-          echo "Building…" 
-
-      # 3. Upload the result as an artifact
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: build-output           # ← Logical name for the artifact
-          path: First_App/bin/*.apk    # ← Replace with your actual build file or directory
+          python-version: '3.10'
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      # 4a. Get the code again (needed for this job)
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # 4b. Download the artifact from the build job
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output          # ← Must exactly match the upload’s name
-          path: downloaded-artifact   # ← Folder where it will be saved
-
-      # 4c. Verify it’s there
-      - name: List downloaded files
-        run: ls -R downloaded-artifact
-
-      # 4d. (Optional) Use it
-      - name: Use the artifact
+      - name: Install dependencies
         run: |
-          echo "The artifact is in downloaded-artifact/"
-          # e.g.:
-          # adb install downloaded-artifact/app-debug.apk
+          sudo apt update
+          sudo apt install -y python3-pip zip unzip openjdk-17-jdk
+          pip install --upgrade pip
+          pip install cython==0.29.36 virtualenv
+          pip install buildozer
+
+      - name: Build APK with Buildozer
+        run: |
+          cd First_App
+          buildozer android debug
+
+      - name: Debug: Check APK build output
+        run: |
+          echo "Listing all folders in repo:"
+          ls -lh
+          echo "Listing First_App:"
+          ls -lh First_App
+          echo "Listing First_App/bin:"
+          ls -lh First_App/bin || echo "Folder First_App/bin not found!"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-apk
+          path: First_App/bin/*.apk
