@@ -10,8 +10,8 @@ jobs:
     steps:
 uses: actions/checkout@v2
 
-      used to cache dependencies with a timeout
-name: Get Date
+      #used to cache dependencies with a timeou
+      name: Get Date
         id: get-date
         run: |
           echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
