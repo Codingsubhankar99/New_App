@@ -8,33 +8,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository code
       - uses: actions/checkout@v2
-      
-#used to to
+
+      # Get the current date
       - name: Get Date
         id: get-date
-        run: I
-        echo "date=$DATE" >> "$GITHUB_OUTPUT"
+        run: echo "::set-output name=date::$(/bin/date -u '+%Y%m%d')"
         shell: bash
 
+      # Cache the Buildozer global directory
       - name: Cache Buildozer global directory
         uses: actions/cache@v2
         with:
           path: .buildozer_global
           key: buildozer-global-${{ hashFiles('buildozer.spec') }}
 
-       - uses: actions/cache@v2
+      # Cache the Buildozer build directory
+      - name: Cache Buildozer build directory
+        uses: actions/cache@v2
         with:
           path: .buildozer
           key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
 
+      # Build the APK using Buildozer
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
         id: buildozer
         with:
-          command: buildozer android debug
+          command: android debug
           buildozer_version: master
 
+      # Upload the built APK as an artifact
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
