@@ -12,7 +12,7 @@ jobs:
     steps:
       # 1. Get the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 2. Run your build
       - name: Build project
@@ -25,7 +25,7 @@ jobs:
 
       # 3. Upload the result as an artifact
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-output           # ← Logical name for the artifact
           path: path/to/output.file    # ← Replace with your actual build file or directory
@@ -36,11 +36,11 @@ jobs:
     steps:
       # 4a. Get the code again (needed for this job)
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 4b. Download the artifact from the build job
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-output          # ← Must exactly match the upload’s name
           path: downloaded-artifact   # ← Folder where it will be saved
