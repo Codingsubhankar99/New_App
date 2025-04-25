@@ -1,47 +1,65 @@
-name: Build Android APK
+name: CI Pipeline
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
+      # 2. Set up Python and install Buildozer dependencies
+      - name: Set up environment and install Buildozer
         run: |
           sudo apt update
-          sudo apt install -y python3-pip zip unzip openjdk-17-jdk
+          sudo apt install -y python3-pip build-essential git zip unzip openjdk-17-jdk libncurses5 libstdc++6 libffi-dev libssl-dev libsqlite3-dev zlib1g-dev libpng-dev libjpeg-dev
           pip install --upgrade pip
-          pip install cython==0.29.36 virtualenv
           pip install buildozer
 
-      - name: Build APK with Buildozer
+      # 3. Build the APK using Buildozer
+      - name: Build APK
         run: |
           cd First_App
           buildozer android debug
 
-      - name: Debug: Check APK build output
-        run: |
-          echo "Listing all folders in repo:"
-          ls -lh
-          echo "Listing First_App:"
-          ls -lh First_App
-          echo "Listing First_App/bin:"
-          ls -lh First_App/bin || echo "Folder First_App/bin not found!"
+      # 4. Show contents of the bin folder for debugging
+      - name: Show APK files
+        run: ls -R First_App/bin
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+      # 5. Upload the APK as an artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: my-apk
+          name: build-output
           path: First_App/bin/*.apk
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # 6. Checkout code (needed for context, even though artifact is downloaded separately)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 7. Download the artifact from the build job
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: downloaded-artifact
+
+      # 8. Verify it's downloaded
+      - name: List downloaded files
+        run: ls -R downloaded-artifact
+
+      # 9. (Optional) Use it or prepare for deployment
+      - name: Use the artifact
+        run: echo "The artifact is in downloaded-artifact/"
