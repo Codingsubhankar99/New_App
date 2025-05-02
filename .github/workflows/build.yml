@@ -19,8 +19,9 @@ jobs:
       - name: Set up environment and install Buildozer
         run: |
           sudo apt update
-          sudo apt install -y python3-pip build-essential git zip unzip openjdk-17-jdk libncurses5 libstdc++6 libffi-dev libssl-dev libsqlite3-dev zlib1g-dev libpng-dev libjpeg-dev
+          sudo apt install -y python3-pip build-essential git zip unzip openjdk-17-jdk libncurses5 libstdc++6 libffi-dev libssl-dev libsqlite3-dev zlib1g-dev libpng-dev libjpeg-dev libfreetype6-dev
           pip install --upgrade pip
+          pip install cython
           pip install buildozer
 
       # 3. Build the APK using Buildozer
@@ -37,29 +38,25 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: package
-          path: '**/bin/*.apk'
+          name: build-output
+          path: First_App/bin/*.apk
 
   test:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      # 6. Checkout code (needed for context, even though artifact is downloaded separately)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 7. Download the artifact from the build job
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: build-output
           path: downloaded-artifact
 
-      # 8. Verify it's downloaded
       - name: List downloaded files
         run: ls -R downloaded-artifact
 
-      # 9. (Optional) Use it or prepare for deployment
       - name: Use the artifact
         run: echo "The artifact is in downloaded-artifact/"
