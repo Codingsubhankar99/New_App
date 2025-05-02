@@ -1,4 +1,4 @@
-name: Build Python APK
+name: Build Kivy APK
 
 on:
   push:
@@ -19,20 +19,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Buildozer dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt || echo "No requirements.txt found."
+          sudo apt update
+          sudo apt install -y build-essential git zip unzip openjdk-17-jdk python3-pip \
+            libncurses5 libffi-dev libssl-dev libsqlite3-dev libjpeg-dev libpng-dev \
+            libgl1-mesa-dev libgles2-mesa-dev libgstreamer1.0 libmtdev-dev libgtk-3-dev \
+            autoconf automake libtool pkg-config zlib1g-dev
+          pip install --upgrade pip setuptools wheel cython
+          pip install buildozer
 
-      - name: Build project
+      - name: Build APK with Buildozer
         run: |
-          echo "Start your build process here"
-          # Example: Use buildozer if building APK
-          # pip install buildozer
-          # buildozer android debug
+          buildozer android debug
 
-      - name: Upload build artifact
+      - name: Upload generated APK
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: path/to/your/output.apk  # Replace with actual APK path
+          path: bin/*.apk
