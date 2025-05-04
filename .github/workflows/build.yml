@@ -46,4 +46,4 @@ jobs:
 
       - name: Initialize and build APK
         run: |
-          buildozer android debug
+          buildozer android debug --verbose
