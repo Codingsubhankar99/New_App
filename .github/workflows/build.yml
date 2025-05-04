@@ -45,5 +45,5 @@ jobs:
 
       - name: Initialize and build APK
         run: |
-          cd First_App
+          cd New_App
           buildozer android debug
