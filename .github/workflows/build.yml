@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Android SDK and NDK
         run: |
-          yes | buildozer android
+          yes | buildozer android update
 
       - name: Build APK
         run: |
