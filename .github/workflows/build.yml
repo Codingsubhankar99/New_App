@@ -24,11 +24,7 @@ jobs:
           sudo apt install -y software-properties-common
           sudo add-apt-repository universe
           sudo apt update
-
-          # Fix unmet dependencies
           sudo apt install -y libunwind-dev
-
-          # Install remaining dependencies
           sudo apt install -y build-essential ccache \
             libffi-dev libssl-dev libsqlite3-dev libjpeg-dev zlib1g-dev \
             libpng-dev python3-pip python3-setuptools zip unzip openjdk-17-jdk \
@@ -38,12 +34,15 @@ jobs:
             libfreetype6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
             libmtdev-dev libncurses-dev
 
-      - name: Install Buildozer and cython
+      - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
-          pip install buildozer
-          pip install cython
+          pip install buildozer cython
 
-      - name: Initialize and build APK
+      - name: Install Android SDK and NDK
+        run: |
+          yes | buildozer android
+
+      - name: Build APK
         run: |
           buildozer android debug --verbose
