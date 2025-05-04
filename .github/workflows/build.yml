@@ -38,10 +38,11 @@ jobs:
             libfreetype6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
             libmtdev-dev libncurses-dev
 
-      - name: Install Buildozer
+      - name: Install Buildozer and cython
         run: |
           pip install --upgrade pip
           pip install buildozer
+          pip instal cython
 
       - name: Initialize and build APK
         run: |
