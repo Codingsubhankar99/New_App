@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -19,12 +19,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Buildozer and dependencies
+      - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y software-properties-common
           sudo add-apt-repository universe
           sudo apt update
+
+          # Fix for libgstreamer1.0-dev unmet dependencies
+          sudo apt install -y libunwind-dev
+
+          # Install remaining dependencies
           sudo apt install -y build-essential ccache \
             libffi-dev libssl-dev libsqlite3-dev libjpeg-dev zlib1g-dev \
             libpng-dev python3-pip python3-setuptools zip unzip openjdk-17-jdk \
@@ -34,16 +39,17 @@ jobs:
             libfreetype6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
             libmtdev-dev libncurses5
 
+      - name: Install Buildozer and Cython
+        run: |
           pip install --upgrade pip Cython
           pip install buildozer
 
-      - name: Build APK with Buildozer
+      - name: Initialize and build APK
         run: |
-          cd First_App
           buildozer android debug
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: my-calculator-apk
-          path: First_App/bin/*.apk
+          name: calculator-apk
+          path: bin/*.apk
