@@ -33,11 +33,18 @@ jobs:
             libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
             libfreetype6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
             libmtdev-dev libncurses-dev
+            
+      - name: Install pkg-config
+        run: sudo apt-get install pkg-config
+
+      - name: Install OpenSSL
+        run: sudo apt-get install libssl-dev
 
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
-          pip install buildozer cython
+          pip install --upgrade buildozer
+          pip install cython 
 
       - name: Install Android SDK and NDK
         run: |
