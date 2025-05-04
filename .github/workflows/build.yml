@@ -42,7 +42,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install buildozer
-          pip instal cython
+          pip install cython
 
       - name: Initialize and build APK
         run: |
