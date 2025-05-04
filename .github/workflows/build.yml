@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
@@ -22,23 +22,28 @@ jobs:
       - name: Install Buildozer and dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential ccache libncurses5 libstdc++6 \
+          sudo apt install -y software-properties-common
+          sudo add-apt-repository universe
+          sudo apt update
+          sudo apt install -y build-essential ccache \
             libffi-dev libssl-dev libsqlite3-dev libjpeg-dev zlib1g-dev \
             libpng-dev python3-pip python3-setuptools zip unzip openjdk-17-jdk \
-            git python3 python3-dev libsdl2-dev libsdl2-image-dev \
-            libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev \
-            libavformat-dev libavcodec-dev libfreetype6-dev libgstreamer1.0-dev \
-            libgstreamer-plugins-base1.0-dev libmtdev-dev
+            git python3 python3-dev \
+            libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+            libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
+            libfreetype6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            libmtdev-dev libncurses5
+
           pip install --upgrade pip Cython
           pip install buildozer
 
       - name: Build APK with Buildozer
         run: |
-          cd first_app
+          cd First_App
           buildozer android debug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-calculator-apk
-          path: first_app/bin/*.apk
+          path: First_App/bin/*.apk
