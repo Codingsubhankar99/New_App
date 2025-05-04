@@ -1,4 +1,4 @@
-name: Python CI Pipeline
+name: Build Kivy APK
 
 on:
   push:
@@ -19,49 +19,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Buildozer and dependencies
         run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          sudo apt update
+          sudo apt install -y build-essential ccache libncurses5 libstdc++6 \
+            libffi-dev libssl-dev libsqlite3-dev libjpeg-dev zlib1g-dev \
+            libpng-dev python3-pip python3-setuptools zip unzip openjdk-17-jdk \
+            git python3 python3-dev libsdl2-dev libsdl2-image-dev \
+            libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev \
+            libavformat-dev libavcodec-dev libfreetype6-dev libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev libmtdev-dev
+          pip install --upgrade pip Cython
+          pip install buildozer
 
-      - name: Optional build step
+      - name: Build APK with Buildozer
         run: |
-          echo "Add build logic here if needed"
-          mkdir build && echo "Hello from build" > build/output.txt
+          cd first_app
+          buildozer android debug
 
-      - name: Upload build artifact
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
-          path: build/
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output
-          path: downloaded-artifact
-
-      - name: List downloaded files
-        run: ls -R downloaded-artifact
-
-      - name: Run tests
-        run: pytest
+          name: my-calculator-apk
+          path: first_app/bin/*.apk
