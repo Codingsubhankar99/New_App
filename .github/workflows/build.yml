@@ -1,10 +1,9 @@
-name: Build Kivy APK
+name: Build Kivy Android APK
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
@@ -12,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
@@ -26,7 +25,7 @@ jobs:
           sudo add-apt-repository universe
           sudo apt update
 
-          # Fix for libgstreamer1.0-dev unmet dependencies
+          # Fix unmet dependencies
           sudo apt install -y libunwind-dev
 
           # Install remaining dependencies
@@ -37,19 +36,14 @@ jobs:
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
             libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
             libfreetype6-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-            libmtdev-dev libncurses5
+            libmtdev-dev libncurses-dev
 
-      - name: Install Buildozer and Cython
+      - name: Install Buildozer
         run: |
-          pip install --upgrade pip Cython
+          pip install --upgrade pip
           pip install buildozer
 
       - name: Initialize and build APK
         run: |
+          cd first_app
           buildozer android debug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: calculator-apk
-          path: bin/*.apk
