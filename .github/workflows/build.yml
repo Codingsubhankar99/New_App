@@ -45,8 +45,11 @@ jobs:
           if [ -f configure.ac ]; then
             autoupdate
           fi
-      - name: Accept Android SDK Licenses
-        run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses <<<'y'
+      - name: Force install Android SDK 34 and build-tools 34.0.0
+        run: |
+          mkdir -p ~/.android && touch ~/.android/repositories.cfg
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Build APK
         run: |
