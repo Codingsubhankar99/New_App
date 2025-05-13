@@ -9,14 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      ANDROID_HOME: $HOME/.buildozer/android/platform/android-sdk
-      PATH: $PATH:$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin
-
     steps:
-      - name: Install tar (if missing)
-        run: sudo apt-get update && sudo apt-get install -y tar
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -37,33 +30,28 @@ jobs:
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
             libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libmtdev-dev libncurses-dev pkg-config
-
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install buildozer==1.5.0
           pip install cython
-
       - name: Ensure buildozer.spec exists
         run: |
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
-
-      - name: Download Android SDK Command Line Tools
+      - name: Update autoconf and run autoupdate
         run: |
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          cd $ANDROID_HOME/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip
-          mkdir -p $ANDROID_HOME/cmdline-tools/latest
-          mv cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
-
-      - name: Accept Licenses and Install SDK Components
-        run: |
-          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
-          sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+          if [ -f configure.ac ]; then
+            autoupdate
+          fi
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Build APK
         run: |
           buildozer android debug --verbose
+          if [ $? -ne 0 ]; then
+            echo "Build failed. Check logs for details."
+            exit 1
+          fi
