@@ -15,11 +15,10 @@ log_level = 2
 warn_on_root = 1
 android.api = 34
 android.minapi = 21
+android.sdk = 34
 android.ndk = 25b
-android.accept_sdk_license = True
-android.archs = arm64-v8a, armeabi-v7a
-android.sdk = 24
 android.ndk_api = 21
+android.archs = arm64-v8a, armeabi-v7a
 android.build_tools = 34.0.0
 p4a.branch = master
 
