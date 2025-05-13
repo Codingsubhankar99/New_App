@@ -74,6 +74,14 @@ jobs:
         run: |
            sdkmanager "build-tools;36.0.0" "platform-tools" "platforms;android-34" "tools"
 
+      - name: Install SDK and build tools
+        run: |
+             sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "extras;google;m2repository" "extras;android;m2repository"
+
+      - name: Accept Android SDK licenses
+        run: |
+          yes | sdkmanager --licenses
+
       - name: Build APK
         run: |
           buildozer android debug --verbose
