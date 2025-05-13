@@ -49,9 +49,8 @@ jobs:
             autoupdate
           fi
 
-      - name: Install Android SDK and NDK
-        run: |
-          yes | buildozer android update
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Build APK
         run: |
