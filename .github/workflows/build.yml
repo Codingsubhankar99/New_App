@@ -45,6 +45,17 @@ jobs:
           if [ -f configure.ac ]; then
             autoupdate
           fi
+
+      - name: Install Android cmdline-tools and add to PATH
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          mv cmdline-tools latest
+          echo "export ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
+          
       - name: Force install Android SDK 34 and build-tools 34.0.0
         run: |
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
