@@ -30,33 +30,36 @@ jobs:
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
             libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libmtdev-dev libncurses-dev pkg-config
+
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install buildozer==1.5.0
           pip install cython
+
       - name: Ensure buildozer.spec exists
         run: |
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
-      - name: Update autoconf and run autoupdate
-        run: |
-          if [ -f configure.ac ]; then
-            autoupdate
-          fi
 
-      - name: Install Android cmdline-tools and add to PATH
+      - name: Install Android cmdline-tools and update environment
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip cmdline-tools.zip
           mv cmdline-tools latest
-          echo "export ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "export PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
-          
-      - name: Force install Android SDK 34 and build-tools 34.0.0
+        env:
+          ANDROID_SDK_ROOT: $HOME/android-sdk
+
+      - name: Set up environment variables
+        run: |
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+
+      - name: Accept licenses and install SDK 34
         run: |
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           yes | sdkmanager --licenses
