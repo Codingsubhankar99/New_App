@@ -20,7 +20,7 @@ android.accept_sdk_license = True
 android.archs = arm64-v8a, armeabi-v7a
 android.sdk = 24
 android.ndk_api = 21
-android.build_tools_version = 34.0.0
+android.build_tools = 34.0.0
 p4a.branch = master
 
 [android]
