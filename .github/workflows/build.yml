@@ -46,7 +46,7 @@ jobs:
             autoupdate
           fi
       - name: Accept Android SDK Licenses
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+        run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses <<<'y'
 
       - name: Build APK
         run: |
