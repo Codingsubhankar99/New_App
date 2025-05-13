@@ -11,11 +11,11 @@ jobs:
 
     env:
       ANDROID_HOME: $HOME/.buildozer/android/platform/android-sdk
-      PATH: $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
+      PATH: $PATH:$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin
 
     steps:
       - name: Install tar (if missing)
-        run:  apt-get update && apt-get install -y tar
+        run: sudo apt-get update && sudo apt-get install -y tar
 
       - name: Checkout code
         uses: actions/checkout@v3
