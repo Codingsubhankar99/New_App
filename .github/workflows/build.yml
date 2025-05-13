@@ -61,13 +61,14 @@ jobs:
 
       - name: Install Android command-line tools and accept licenses
         run: |
-         mkdir -p ~/.android && touch ~/.android/repositories.cfg
-         wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-         unzip cmdline-tools.zip -d $HOME/android
-         mkdir -p $ANDROID_HOME/cmdline-tools/latest
-         mv $HOME/android/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
-         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=${ANDROID_HOME} --licenses
-         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;36.0.0" "platforms;android-34"
+          mkdir -p ~/.android && touch ~/.android/repositories.cfg
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip -d $HOME/android
+          rm -rf $ANDROID_HOME/cmdline-tools/latest
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest
+          mv $HOME/android/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=${ANDROID_HOME} --licenses
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;36.0.0" "platforms;android-34"
 
       - name: Build APK
         run: |
