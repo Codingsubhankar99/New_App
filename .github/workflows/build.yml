@@ -70,6 +70,10 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=${ANDROID_HOME} --licenses
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=${ANDROID_HOME} "build-tools;36.0.0" "platforms;android-34"
 
+      - name: Install AIDL tool
+         run:|
+           sdkmanager "build-tools;36.0.0" "platform-tools" "platforms;android-34" "tools"
+
       - name: Build APK
         run: |
           buildozer android debug --verbose
