@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_HOME: $HOME/.buildozer/android/platform/android-sdk
+      PATH: $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,19 +47,20 @@ jobs:
             buildozer init
           fi
 
-      - name: Update autoconf and run autoupdate
+      - name: Download Android SDK Command Line Tools
         run: |
-          if [ -f configure.ac ]; then
-            autoupdate
-          fi
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          cd $ANDROID_HOME/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest
+          mv cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
 
-      - name: Accept Android SDK Licenses
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+      - name: Accept Licenses and Install SDK Components
+        run: |
+          yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
+          sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
       - name: Build APK
         run: |
           buildozer android debug --verbose
-          if [ $? -ne 0 ]; then
-            echo "Build failed. Check logs for details."
-            exit 1
-          fi
