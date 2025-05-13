@@ -19,7 +19,7 @@ android.sdk = 34
 android.ndk = 25b
 android.ndk_api = 21
 android.archs = arm64-v8a, armeabi-v7a
-android.build_tools = 34.0.0
+android.build_tools = 36.0.0
 p4a.branch = master
 
 [android]
