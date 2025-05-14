@@ -52,7 +52,14 @@ jobs:
 
       - name: Install Android SDK and Build Tools
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;36.0.0"
+          sdkmanager --verbose "platform-tools" "platforms;android-34" "build-tools;36.0.0" "tools"
+
+      - name: Verify AIDL Installation
+        run: |
+          if ! command -v aidl; then
+            echo "AIDL tool is not installed. Ensure Build Tools are correctly installed."
+            exit 1
+          fi
 
       - name: Build APK
         run: |
