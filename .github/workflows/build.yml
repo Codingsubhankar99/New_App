@@ -46,7 +46,7 @@ jobs:
 
       - name: Install Android SDK and Build Tools
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "extras;google;m2repository" "extras;android;m2repository"
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;36.0.0" "extras;google;m2repository" "extras;android;m2repository"
 
       - name: Build APK
         run: |
