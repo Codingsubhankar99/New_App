@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install system dependencies
         run: |
@@ -45,22 +45,37 @@ jobs:
           unzip cmdline-tools.zip
           mv cmdline-tools latest
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
-      - name: Accept Android SDK Licenses
-        run: yes | sdkmanager --licenses
+      - name: Accept Android SDK licenses
+        run: |
+          sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
 
       - name: Install Android SDK and Build Tools
         run: |
-          sdkmanager --verbose "platform-tools" "platforms;android-34" "build-tools;34.0.0" "tools"
+          sdkmanager --sdk_root=$HOME/android-sdk --verbose \
+            "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Debug Build Tools Installation
+        run: |
+          ls -la $HOME/android-sdk/build-tools/34.0.0 || echo "Build tools not found"
 
       - name: Verify AIDL Installation
         run: |
           if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
-            echo "AIDL tool is not installed. Please check SDK setup."
-            exit 1
+            echo "AIDL tool is not installed. Reinstalling build tools."
+            sdkmanager --sdk_root=$HOME/android-sdk --uninstall "build-tools;34.0.0"
+            sdkmanager --sdk_root=$HOME/android-sdk "build-tools;34.0.0"
+            if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
+              echo "AIDL tool is still missing. Please check SDK setup or try another version."
+              exit 1
+            fi
           fi
 
       - name: Build APK
         run: |
           buildozer android debug --verbose
+          if [ $? -ne 0 ]; then
+            echo "Build failed. Check logs for details."
+            exit 1
+          fi
