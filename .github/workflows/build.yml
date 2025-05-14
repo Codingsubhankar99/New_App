@@ -66,8 +66,16 @@ jobs:
             echo "AIDL tool is not installed. Reinstalling build tools."
             sdkmanager --sdk_root=$HOME/android-sdk --uninstall "build-tools;34.0.0"
             sdkmanager --sdk_root=$HOME/android-sdk "build-tools;34.0.0"
+            
             if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
-              echo "AIDL tool is still missing. Please check SDK setup or try another version."
+              echo "AIDL tool is still missing. Attempting manual installation."
+              mkdir -p $HOME/android-sdk/build-tools/34.0.0/
+              wget https://dl.google.com/android/repository/aidl-tool-url -O $HOME/android-sdk/build-tools/34.0.0/aidl
+              chmod +x $HOME/android-sdk/build-tools/34.0.0/aidl
+            fi
+            
+            if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
+              echo "AIDL tool installation failed. Please check SDK setup or try another Build Tools version."
               exit 1
             fi
           fi
