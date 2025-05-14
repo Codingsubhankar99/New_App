@@ -17,6 +17,7 @@ android.api = 34
 android.minapi = 21
 android.sdk = 34
 android.sdk_path = /usr/local/lib/android/sdk
+android.ndk_path = /usr/local/lib/android/ndk
 android.ndk = 25b
 android.ndk_api = 21
 android.archs = arm64-v8a, armeabi-v7a
