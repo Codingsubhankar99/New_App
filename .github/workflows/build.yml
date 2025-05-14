@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
       - name: Install system dependencies
         run: |
@@ -47,24 +47,20 @@ jobs:
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
-      - name: Accept Android SDK licenses
+      - name: Accept Android SDK Licenses
         run: yes | sdkmanager --licenses
 
       - name: Install Android SDK and Build Tools
         run: |
-          sdkmanager --verbose "platform-tools" "platforms;android-34" "build-tools;36.0.0" "tools"
+          sdkmanager --verbose "platform-tools" "platforms;android-34" "build-tools;34.0.0" "tools"
 
       - name: Verify AIDL Installation
         run: |
-          if ! command -v aidl; then
-            echo "AIDL tool is not installed. Ensure Build Tools are correctly installed."
+          if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
+            echo "AIDL tool is not installed. Please check SDK setup."
             exit 1
           fi
 
       - name: Build APK
         run: |
           buildozer android debug --verbose
-          if [ $? -ne 0 ]; then
-            echo "Build failed. Check logs for details."
-            exit 1
-          fi
