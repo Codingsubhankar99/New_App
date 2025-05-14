@@ -1,81 +1,40 @@
-name: Build Kivy Android APK
-
+name: CI
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Get Date
+        id: get-date
+        run: echo "date=$(date -u +'%Y%m%d')" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Cache Buildozer global directory
+        uses: actions/cache@v2
         with:
-          python-version: '3.11'
+          path: .buildozer_global
+          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
 
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y software-properties-common
-          sudo add-apt-repository universe
-          sudo apt update
-          sudo apt install -y libunwind-dev autoconf automake libtool build-essential ccache \
-            libffi-dev libssl-dev libsqlite3-dev libjpeg-dev zlib1g-dev libpng-dev \
-            python3-pip python3-setuptools zip unzip openjdk-8-jdk git python3 python3-dev \
-            libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
-            libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev \
-            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libmtdev-dev libncurses-dev pkg-config
+      - uses: actions/cache@v2
+        with:
+          path: .buildozer
+          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
 
-      - name: Install Buildozer and Cython
-        run: |
-          pip install --upgrade pip
-          pip install buildozer==1.5.0
-          pip install cython
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          command: buildozer android debug
+          buildozer_version: master
 
-      - name: Download Android Command Line Tools
-        run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip
-          mv cmdline-tools latest
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-
-      - name: Accept Android SDK licenses
-        run: |
-          sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
-
-      - name: Install Android SDK and Build Tools
-        run: |
-          sdkmanager --sdk_root=$HOME/android-sdk --verbose \
-            "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-      - name: Debug Build Tools Installation
-        run: |
-          ls -la $HOME/android-sdk/build-tools/34.0.0 || echo "Build tools not found"
-
-      - name: Verify AIDL Installation
-        run: |
-          if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
-            echo "AIDL tool is not installed. Reinstalling build tools."
-            sdkmanager --sdk_root=$HOME/android-sdk --uninstall "build-tools;34.0.0"
-            sdkmanager --sdk_root=$HOME/android-sdk "build-tools;34.0.0"
-            if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
-              echo "AIDL tool is still missing. Please check SDK setup or try another version."
-              exit 1
-            fi
-          fi
-
-      - name: Build APK
-        run: |
-          buildozer android debug --verbose
-          if [ $? -ne 0 ]; then
-            echo "Build failed. Check logs for details."
-            exit 1
-          fi
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: bin/*.apk
