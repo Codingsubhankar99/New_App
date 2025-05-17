@@ -54,15 +54,19 @@ jobs:
       - name: Install Android SDK and Build Tools
         run: |
           sdkmanager --sdk_root=$HOME/android-sdk --verbose \
-            "platform-tools" "platforms;android-34" "build-tools;34.0.0"         
+            "platform-tools" "platforms;android-34" "build-tools;33.0.3"
+
+      - name: Install Command Line Tools
+        run: |
+          sdkmanager --install "cmdline-tools;latest"
 
       - name: Verify AIDL Installation
         run: |
-          if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
+          if [ ! -f "$HOME/android-sdk/build-tools/33.0.3/aidl" ]; then
             echo "AIDL tool is not installed. Reinstalling build tools."
-            sdkmanager --sdk_root=$HOME/android-sdk --uninstall "build-tools;34.0.0"
-            sdkmanager --sdk_root=$HOME/android-sdk "build-tools;34.0.0"
-            if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
+            sdkmanager --sdk_root=$HOME/android-sdk --uninstall "build-tools;33.0.3"
+            sdkmanager --sdk_root=$HOME/android-sdk "build-tools;33.0.3"
+            if [ ! -f "$HOME/android-sdk/build-tools/33.0.3/aidl" ]; then
               echo "AIDL tool is still missing. Please check SDK setup or try another version."
               exit 1
             fi
@@ -76,11 +80,11 @@ jobs:
       - name: Debug SDK Installation
         run: |
           sdkmanager --sdk_root=$HOME/android-sdk --list
-          ls -al $HOME/android-sdk/build-tools/34.0.0
+          ls -al $HOME/android-sdk/build-tools/33.0.3
 
       - name: Debug Build Tools Installation
         run: |
-          ls -la $HOME/android-sdk/build-tools/34.0.0 || echo "Build tools not found"
+          ls -la $HOME/android-sdk/build-tools/33.0.3 || echo "Build tools not found"
 
       - name: Debug Android SDK Setup
         run: |
