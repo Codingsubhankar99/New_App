@@ -29,7 +29,7 @@ jobs:
           key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Build with Buildozer
-        uses: knezi/buildozer-action@v1
+        uses: knezi/buildozer-action@c02a3e0b64f9c4c14cc1a153b0b68f0228a3f6b3
         id: buildozer
         with:
           command: buildozer android debug
