@@ -36,7 +36,7 @@ jobs:
           buildozer_version: stable
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3.14
+        uses: actions/upload-artifact@v3.1.4
         with:
           name: package
           path: ${{ steps.buildozer.outputs.filename }}
