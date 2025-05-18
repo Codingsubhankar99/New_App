@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
+          
       - name: Install system dependencies
         run: |
           sudo apt update
@@ -30,6 +30,10 @@ jobs:
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
             libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libmtdev-dev libncurses-dev pkg-config
+
+      - name: Clean Buildozer
+        run: |
+          buildozer android clean
 
       - name: Install Buildozer and Cython
         run: |
