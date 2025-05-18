@@ -5,6 +5,7 @@ package.domain = org.subhankar.calcu
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
+icon.filename = icon.png
 requirements = python3,kivy,cython
 orientation = portrait
 fullscreen = 1
