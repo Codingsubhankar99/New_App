@@ -31,9 +31,9 @@ jobs:
       - name: Build with Buildozer
         uses: knezi/buildozer-action@v1
         id: buildozer
-           with:
-        command: buildozer android debug
-        buildozer_version: stable
+        with:
+          command: buildozer android debug
+          buildozer_version: stable
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
