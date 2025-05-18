@@ -14,8 +14,7 @@ jobs:
 
       - name: Get Date
         id: get-date
-        run: echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
-        shell: bash
+        run: echo "date=$(/bin/date -u '+%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Cache Buildozer global directory
         uses: actions/cache@v4
@@ -37,7 +36,7 @@ jobs:
           buildozer_version: stable
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@e6f6d7aeb4e42bba60b8fbefaa0a1c54e2c6527b
         with:
           name: package
           path: ${{ steps.buildozer.outputs.filename }}
