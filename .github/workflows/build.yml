@@ -31,7 +31,7 @@ jobs:
       - name: Build with Buildozer
         uses: knezi/buildozer-action@v1
         id: buildozer
-      with:
+           with:
         command: buildozer android debug
         buildozer_version: stable
 
