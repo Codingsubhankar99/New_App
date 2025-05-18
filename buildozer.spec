@@ -17,10 +17,10 @@ warn_on_root = 1
 android.api = 34
 android.minapi = 24
 android.sdk = 34
-android.ndk = 25b
+android.ndk = 26.1.10991
 android.ndk_api = 24
 android.archs = arm64-v8a, armeabi-v7a
-android.build_tools = 33.0.3
+android.build_tools = 34.0.0
 p4a.branch = master
 
 [android]
