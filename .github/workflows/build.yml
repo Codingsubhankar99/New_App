@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -21,26 +21,18 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y software-properties-common
-          sudo add-apt-repository universe
-          sudo apt update
           sudo apt install -y libunwind-dev autoconf automake libtool build-essential ccache \
             libffi-dev libssl-dev libsqlite3-dev libjpeg-dev zlib1g-dev libpng-dev \
-            python3-pip python3-setuptools zip unzip openjdk-17-jdk git python3 python3-dev \
+            python3-pip python3-setuptools zip unzip git python3 python3-dev openjdk-17-jdk \
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
             libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libmtdev-dev libncurses-dev pkg-config
 
-      - name: Set Java 17 Environment
-        run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
-     
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
-          pip install buildozer==1.5.0
-          pip install cython
+          pip install buildozer==1.5.0 cython
+
       - name: Download Android Command Line Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
@@ -50,47 +42,28 @@ jobs:
           mv cmdline-tools latest
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-      - name: Accept Android SDK licenses
+
+      - name: Restore Android Licenses
         run: |
-          sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
+          mkdir -p $HOME/android-sdk/licenses
+          cp -r android-licenses/* $HOME/android-sdk/licenses/
+
       - name: Install Android SDK and Build Tools
         run: |
-          sdkmanager --sdk_root=$HOME/android-sdk --verbose \
-            "platform-tools" "platforms;android-33" "build-tools;33.0.2"
-      - name: Install Command Line Tools
-        run: |
-          sdkmanager --install "cmdline-tools;latest"
+          sdkmanager --sdk_root=$HOME/android-sdk --install "platform-tools" "platforms;android-33" "build-tools;34.0.0"
+
       - name: Verify AIDL Installation
         run: |
-          if [ ! -f "$HOME/android-sdk/build-tools/33.0.2/aidl" ]; then
-            echo "AIDL tool is not installed. Reinstalling build tools."
-            sdkmanager --sdk_root=$HOME/android-sdk --uninstall "build-tools;33.0.2"
-            sdkmanager --sdk_root=$HOME/android-sdk "build-tools;33.0.2"
-            if [ ! -f "$HOME/android-sdk/build-tools/33.0.2/aidl" ]; then
-              echo "AIDL tool is still missing. Please check SDK setup or try another version."
-              exit 1
-            fi
+          if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
+            echo "AIDL tool is not installed. Exiting."
+            exit 1
           else
             echo "AIDL tool is successfully installed."
           fi
+
       - name: Fix SDK Permissions
-        run: |
-          sudo chmod -R 777 $HOME/android-sdk
-      - name: Debug SDK Installation
-        run: |
-          sdkmanager --sdk_root=$HOME/android-sdk --list
-          ls -al $HOME/android-sdk/build-tools/33.0.2
-      - name: Debug Build Tools Installation
-        run: |
-          ls -la $HOME/android-sdk/build-tools/33.0.2 || echo "Build tools not found"
-      - name: Debug Android SDK Setup
-        run: |
-          ls -la $HOME/android-sdk
-          ls -la $HOME/android-sdk/build-tools
+        run: sudo chmod -R 777 $HOME/android-sdk
+
       - name: Build APK
         run: |
           buildozer android debug --verbose
-          if [ $? -ne 0 ]; then
-            echo "Build failed. Check logs for details."
-            exit 1
-          fi
