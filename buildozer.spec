@@ -14,13 +14,13 @@ osx.kivy_version = 2.1.0
 [buildozer]
 log_level = 2
 warn_on_root = 1
-android.api = 34
+android.api = 33
 android.minapi = 24
-android.sdk = 34
+android.sdk = 33
 android.ndk = 26.1.10991
 android.ndk_api = 24
 android.archs = arm64-v8a, armeabi-v7a
-android.build_tools = 34.0.0
+android.build_tools = 33.0.2
 p4a.branch = master
 
 [android]
