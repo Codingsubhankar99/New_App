@@ -59,7 +59,7 @@ jobs:
             "platform-tools" "platforms;android-33" "build-tools;33.0.2"
       - name: Install Command Line Tools
         run: |
-          sdkmanager --install "cmdline-tools;9477386"
+          sdkmanager --install "cmdline-tools;latest"
       - name: Verify AIDL Installation
         run: |
           if [ ! -f "$HOME/android-sdk/build-tools/33.0.2/aidl" ]; then
