@@ -46,7 +46,7 @@ jobs:
           echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
       - name: Accept Android SDK licenses
         run: |
-          sdkmanager --sdk_root=$HOME/android-sdk --licenses || True
+          sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
       - name: Install Android SDK and Build Tools
         run: |
           sdkmanager --sdk_root=$HOME/android-sdk --verbose \
