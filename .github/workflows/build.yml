@@ -27,12 +27,10 @@ jobs:
             libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
             libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libmtdev-dev libncurses-dev pkg-config
-
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install buildozer==1.5.0 cython
-
       - name: Download Android Command Line Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
@@ -42,16 +40,10 @@ jobs:
           mv cmdline-tools latest
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-
-      - name: Restore Android Licenses
-        run: |
-          mkdir -p $HOME/android-sdk/licenses
-          cp -r android-licenses/* $HOME/android-sdk/licenses/
-
+      
       - name: Install Android SDK and Build Tools
         run: |
           sdkmanager --sdk_root=$HOME/android-sdk --install "platform-tools" "platforms;android-33" "build-tools;34.0.0"
-
       - name: Verify AIDL Installation
         run: |
           if [ ! -f "$HOME/android-sdk/build-tools/34.0.0/aidl" ]; then
@@ -60,7 +52,6 @@ jobs:
           else
             echo "AIDL tool is successfully installed."
           fi
-
       - name: Fix SDK Permissions
         run: sudo chmod -R 777 $HOME/android-sdk
 
